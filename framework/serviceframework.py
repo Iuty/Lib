@@ -1,8 +1,9 @@
 from abc import abstractmethod
-import datetime
-import os,config,commonutil,shutil
-from log import SimpleLog
-from show import Process as ShowProcess
+import datetime,os,shutil
+import commonutil.config as config
+import commonutil.dict
+from file.log import SimpleLog
+from show.console import Process as ShowProcess
 
 
 def initPath(file):

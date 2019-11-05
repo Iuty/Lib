@@ -1,4 +1,4 @@
-from files import StringFile
+from file.files import StringFile
 import os,datetime
 
 class Log(StringFile):

@@ -1,4 +1,4 @@
-from files import ByteFile
+from file.files import ByteFile
 import os,datetime
 
 stockroot = os.environ['STOCKSERVICEPATH'] + '//db//'

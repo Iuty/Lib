@@ -1,6 +1,6 @@
 import os,datetime,abc,struct,time
 import random
-from encription import getfilemd5,des_descrypt,des_encrypt
+from encription.encription import getfilemd5,des_descrypt,des_encrypt
 
 class Code:
 	@staticmethod
