@@ -201,6 +201,11 @@ class ServiceFunc:
 		print('receive command [{0}]...,'.format(cmdstring))
 		rtn['success'] = True
 		
+		if keyword == 'getcmds':
+			rtn['result'] = list(servicefunc.__cmds__.keys())
+			print(rtn)
+			return rtn
+		
 		result = None
 		if keyword in servicefunc.__cmds__:
 			result = servicefunc.__cmds__[keyword].__call__(obj,**kwargs)

@@ -1,13 +1,13 @@
 from flask import Flask,render_template,request,jsonify
 import json
-
-from Service import Service
+from framework.serviceframework import ServiceFunc as sf
+from Service.Service import Service
 
 app = Flask(__name__)
 service = Service()
 
 host='127.0.0.1'
-port = 7709
+port = 8710
 
 
 @app.route('/sendcmd',methods = ['POST',])
@@ -22,14 +22,7 @@ def sendcmd():
 	rtn = sf.invokeCmd(service,cmd)
 	return jsonify(rtn)
 
-@app.route('/servicefunc',methods = ['POST',])
-def servicefunc():
-	data = request.json
-	rtn = {'success':False,'reason':'param has no \'func\''}
-	if not 'func' in data:
-		return jsonify(rtn)
-	rtn = sf.invokeBll(service,data)
-	return jsonify(rtn)
-
 if __name__ == '__main__':
+	
 	app.run(host=host,port = port,debug=True,use_reloader=False)
+	
