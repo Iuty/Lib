@@ -18,3 +18,9 @@ class MessageQueue:
 			rtn = self.container.pop(0)
 		self.lock.release()
 		return rtn
+	
+	def clear(self):
+		self.lock.acquire()
+		self.container.clear()
+		self.lock.release()
+		pass
