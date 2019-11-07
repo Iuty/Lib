@@ -2,6 +2,7 @@ import datetime,os
 from abc import abstractmethod
 from show import showProcessInConsole
 from timeutil import getTimeTamp
+from mutithread.threads import SubThread
 import config
 
 class SingleTaskManager:
@@ -89,3 +90,14 @@ class SingleTaskManager:
 			kwargs['Finish'] = len(self.__finished__)
 			showProcessInConsole(self.name,self.__savedata__['starts'],self.Remains,(self.Remains+len(self.__finished__)),**kwargs)
 		return rtn
+		
+class SubTask(SubThread):
+	def __init__(self,notice = None,args = ()):
+		SubThread.__init__(self,self.taskFunc,notice = None,args = ())
+		pass
+	
+	#virtual func
+	def taskFunc(*args):
+		pass
+	
+	pass

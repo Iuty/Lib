@@ -52,7 +52,7 @@ class SubThread(Thread):
 		self._args = args
 		self._onTask = targetfunc
 		
-		self.start()
+		#self.start()
 		pass
 	
 	def threadfunc(self):

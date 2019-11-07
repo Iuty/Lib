@@ -27,6 +27,12 @@ class QuarterFile(ByteFile):
 		ByteFile.__init__(self,title,['common','quarter'],'qut',root)
 		pass
 
+class StackFile(ByteFile):
+	def __init__(self,title):
+		root = stockroot
+		ByteFile.__init__(self,title,['common','stack'],'stk',root)
+		pass
+
 class TransFile(ByteFile):
 	def __init__(self,title,date):
 		root = stockroot

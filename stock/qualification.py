@@ -1,4 +1,4 @@
-from stock.files import QualifyFile, HourFile, DailyFile, WeeklyFile, CqcxDailyFile
+from stock.files import QualifyFile, HourFile, DailyFile, WeeklyFile, CqcxDailyFile,StackFile
 
 '''
 Qualify Method
@@ -465,7 +465,27 @@ class MA(Qualification):
 			else:
 				value.append(None)
 		return tuple(value)
+
+class STMA(Qualification):
+	def __init__(self,code,cycle='D'):
+		Qualification.__init__(self,code,'STMa',cqcx=False)
+		self.cycle = cycle
+		self.dfile = StackFile(code)
+		self.d_data = self.dfile.getData()
 	
+	def calcValue(self,index):
+		level = [5,18,30,60]
+		value = [self.d_data[index][0],]
+		for li in range(0,len(level)):
+			if level[li] <= index:
+				sum = 0.0
+				for i in range(index-level[li]+1,index+1):
+					sum = sum + self.d_data[i][1]
+				value.append(round((sum/level[li]),2))
+			else:
+				value.append(None)
+		return tuple(value)
+
 	
 class KDJ(Qualification):
 	
