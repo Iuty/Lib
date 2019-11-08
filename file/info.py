@@ -2,6 +2,7 @@ from encription.encription import getfilemd5,des_descrypt,des_encrypt
 import os
 import random
 
+
 class FileInfo:
 	def __init__(self,path,name):
 		self._path = path
@@ -53,44 +54,52 @@ class FileInfo:
 		return size
 
 class DirInfo:
-	def __init__(self,root,path):
-		if not root in os.sys.path:
-			raise Exception("{} not in system path".format(root))
-		self._root = os.sys.path[root]
+	def __init__(self,path):
 		self._path = path
-		self._fullpath = os.sys.join(root,path)
 	
 	def isExists(self):
-		True if os.path.exists(self._fullpath) else False
+		True if os.path.exists(self._path) else False
 	
 	def getFilesName()
 		rtn = []
 		if self.isExists():
-			files = os.listdir(self._fullpath)
-			rtn = [file for file in files if os.path.isfile(self._fullpath+file)]
+			files = os.listdir(self._path)
+			rtn = [file for file in files if os.path.isfile(self._path+file)]
 		return rtn
 	
-	def getFilesInfo(self,start=0,batch = 0)
-		fs = []
-		rtn = {'filecount':0,'start':start,'files':fs}
+	def getFilesInfo(self,start=0,**kwargs):
+		batch = 200
+		if 'Size' in kwargs:
+			batch = batch//2
+		if 'Md5' in kwargs:
+			batch = batch//4
+
+		rtn = {'start':start}
 		
 		files = self.getFilesName()
+		rtn['filecount'] = len(files)
 		if start > len(files)-1:
 			return rtn
 		end = start + batch
 		
-		if (start + batch) > len(files):
+		if (start + batch) >= len(files):
 			end = len(files)
-		
+
+		fs = []
+		rtn['files'] = fs
+
 		for filename in files[start:end]:
-			fi = FileInfo(self._fullpath,filename)
-			md5 = fi.getMd5()
-			size = fi.getSize()
+			finfo = {'Name':filename}
+			fi = FileInfo(self._path,filename)
+			if 'Size' in kwargs:
+				finfo['Size'] = fi.getSize()
+			if 'Md5' in kwargs:
+				finfo['Md5'] = fi.getMd5()
 			finfo = {'Name':filename,'Md5':md5,'Size':size}
 			fs.append(finfo)
-		rtn[filecount] = len(files)
+		
 		return rtn
 	
 	def creat(self):
 		if not self.isExists():
-			os.mkdir(self._fullpath)
+			os.mkdir(self._path)

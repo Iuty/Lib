@@ -1,8 +1,8 @@
 from file.files import StringFile
-import os,datetime
+import os,datetime,threading
 
 class Log(StringFile):
-	def __init__(self,root = './/logs//',title = 'log'):
+	def __init__(self,root = './/logs//',title = 'default'):
 		if not os.path.exists(root):
 			p = '.'
 			ps = root.split('//')
@@ -30,20 +30,56 @@ class Log(StringFile):
 
 
 class SimpleLog:
-	def __init__(self,path = './/logs//'):
+	def __init__(self,path = './/logs//',level = 1):
+		#path => log dir
+		#level:all,debug,warn,other/info,error
+		#        0,    1,   2,         3,    4
+		self.lock = threading.Lock()
 		self.log = Log(path)
+		pass
 
 	def error(self,msg,**kwargs):
+		self.lock.acquire()
 		self.log.appendLog('error',msg,**kwargs)
+		self.lock.release()
 
 	def info(self,msg,**kwargs):
+		self.lock.acquire()
 		self.log.appendLog('info',msg,**kwargs)
+		self.lock.release()
 
 	def debug(self,msg,**kwargs):
+		self.lock.acquire()
 		self.log.appendLog('debug',msg,**kwargs)
+		self.lock.release()
 
 	def warn(self,msg,**kwargs):
+		self.lock.acquire()
 		self.log.appendLog('warn',msg,**kwargs)
+		self.lock.release()
 
 	def other(self,cmd,msg,**kwargs):
+		self.lock.acquire()
 		self.log.appendLog(cmd,msg,**kwargs)
+		self.lock.release()
+
+class LogManage:
+	def __init__(self):
+		log_d = SimpleLog()
+		self.__logs__ = {'Default':log_d}
+		pass
+
+	def addLog(self,name,path='.//logs//',level = 1):
+		if name in self.__logs__:
+			return
+		log_a = SimpleLog(path=path,level=level,title = name)
+		self.__logs__[name] = log_a
+		pass
+
+	def getLog(self,name = 'Default'):
+		if name in self.__logs__:
+			return self.__logs__[name]
+		else:
+			return self.__logs__['Default']
+
+log4py = LogManage()
