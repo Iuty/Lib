@@ -1,4 +1,4 @@
-from stock.files import QualifyFile, HourFile, DailyFile, WeeklyFile, CqcxDailyFile,StackFile
+from stock.files import QualifyFile, HourFile,QuarterFile, DailyFile, WeeklyFile, CqcxDailyFile,StackFile
 
 '''
 Qualify Method
@@ -497,6 +497,9 @@ class KDJ(Qualification):
 			self.d_data = self.dfile.getData()
 		if cycle == 'H':
 			self.dfile = HourFile(code)
+			self.d_data = self.dfile.getData()
+		if cycle == 'Q':
+			self.dfile = QuarterFile(code)
 			self.d_data = self.dfile.getData()
 
 		

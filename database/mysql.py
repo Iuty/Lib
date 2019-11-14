@@ -28,7 +28,8 @@ if __name__ == '__main__':
 		S = Column(Type = str,IsIndex = True,UnionIndex = True,Length = 4)
 		D = Column(Type = datetime.date,NullAble = True)
 		T = Column(Type = datetime.timedelta,NullAble = True)
-		DT = Column(Type = datetime.datetime,NullAble = True)
+		#CT = Column(Type = datetime.datetime,NullAble = True)
+		CT = Column(Type = datetime.datetime,NullAble = True)
 		E = Column(Type = str,Enum = ['e1','e2','e3'],Default = 'e2')
 		def __init__(self,name = None):
 			if not name is None:
@@ -42,10 +43,10 @@ if __name__ == '__main__':
 	
 
 	for i in range(3000):
-		db0 = t.add(value=[{'F' : 3.14*i,'S' : i,'D':datetime.date.today(),'T':datetime.datetime.now()-s,'DT':s}])
+		db0 = t.update(value=[{'F' : 3.14*i,'S' : i,'D':datetime.date.today(),'T':datetime.datetime.now()-s,'CT':s}],where='ID={}'.format(i*2))
 	db0 = t.query(orderby = 'ID desc')
 	
-	db0 = t.drop()
+	#db0 = t.drop()
 	
 	
 	for d in db0:

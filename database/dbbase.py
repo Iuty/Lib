@@ -442,12 +442,14 @@ class SqlDataBase(DataBaseParam):
             raise DeleteError('Update Has No Value')
         sqlstr += "set "
         setstr = ""
-        for v in kwargs['value']:
-            if len(setstr) > 0:
-                setstr += ','
-            setstr += (v + '=' + '\'' + kwargs['value'][v] + '\'')
+        for val in kwargs['value']:
+            for v in val:
+                if len(setstr) > 0:
+                     setstr += ','
+                #print(val[v])
+                setstr += (v + '=' + '\'' + str(val[v]) + '\'')
     
-        sqlstr += setstr
+            sqlstr += setstr
     
         if 'where' in kwargs:
             sqlstr += ("where " + kwargs['where'])
