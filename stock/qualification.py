@@ -442,7 +442,39 @@ class Qualification:
 			if v[0] == date:
 				return v
 		pass
+
+class BLC(Qualification):
 	
+	def __init__(self,code,cycle='D'):
+		Qualification.__init__(self,code,'Blc'+'_'+cycle,cqcx=False)
+		self.cycle = cycle
+		if cycle == 'W':
+			self.dfile = WeeklyFile(code,cqcx=False)
+			self.d_data = self.dfile.getData()
+
+	def calcValue(self,index):
+		value = [self.d_data[index][0],]
+		v0 = VLV(self.d_data,index,5,3)
+		if v0[0] == index:
+			return (None,)
+		v1 = VLV(self.d_data,index,5,3)
+		if v1[0] == v0[0]:
+			return (None,)
+		value.append(v1[1])
+		mi = min([l for o,h,l,c,a,v in self.d_data[v1[0]:v0[0]]])
+		ma = max([h for o,h,l,c,a,v in self.d_data[v1[0]:v0[0]]])
+		value.append(ma)
+		value.append(mi)
+		value.append(v0[1])
+		vol = 0
+		amount = 0.0
+		for i in self.d_data[v1[0]:v0[0]]:
+			vol += self.d_data[i][6]
+			amount += self.d_data[i][5]
+		value.append(amount)
+		value.append(vol)
+
+		return tuple(value)	
 	
 class MA(Qualification):
 	
