@@ -443,6 +443,75 @@ class Qualification:
 				return v
 		pass
 
+class RNG(Qualification):
+	def __init__(self,code,cycle='D'):
+		Qualification.__init__(self,code,'Rng'+'_'+cycle,cqcx=False)
+		self.cycle = cycle
+		if cycle == 'W':
+			self.dfile = WeeklyFile(code,cqcx=False)
+			self.d_data = self.dfile.getData()
+		kdjfile = KDJ(code,cycle)
+		self.kdjdata = kdjfile.getValues()
+		pass
+
+	def calcValue(self,index):
+		d_date = self.d_data[index][0]
+		d_close = self.d_data[index][4]
+		value = [d_date,d_close]
+		kdjindex = getIndexOfSerial(self.kdjdata,d_date)
+		if kdjindex == -1:
+			return (None,)
+		rl0 = None
+		rh0 = None
+		rl1 = None
+		rh1 = None
+		findl = True
+		findkdjindex0 = kdjindex
+		if self.kdjdata[kdjindex][2] < self.kdjdata[kdjindex][3]:
+			findl = False
+		for i in range(40):
+			if findl:
+				findkdjindex1 = VLV(self.kdjdata,findkdjindex0,4,3)[0]
+			else:
+				findkdjindex1 = VHV(self.kdjdata,findkdjindex0,4,3)[0]
+			if findkdjindex0 == findkdjindex1:
+				return (None,)
+			findkdjindex0 = findkdjindex1
+			findkdj = self.kdjdata[findkdjindex0]
+			finddaily = self.d_data[getIndexOfSerial(self.d_data,findkdj[0])]
+			#print(finddaily)
+			
+			if findl:
+				if findkdj[2]>findkdj[3]:
+					continue
+				findl = False
+				if(d_close > finddaily[4]):#(d_close / 1.05 < finddaily[4]) & 
+					if (rl0 == None):
+						rl0 = finddaily[4]
+					elif (rl1 == None):
+						rl1 = finddaily[4]
+			else:
+				if findkdj[2]<findkdj[3]:
+					continue
+				findl = True
+				if(d_close < finddaily[4]):# (d_close * 1.05 > finddaily[4]) & 
+					if (rh0 == None):
+						rh0 = finddaily[4]
+					elif (rh1 == None):
+						rh1 = finddaily[4]
+			if (not (rh1 == None)) & (not (rl1 == None)):
+				break
+		
+		if (rh1 == None) | (rl1 == None):
+			return (None,)
+		
+		value.append(rl0)
+		value.append(rh0)
+		value.append(rl1)
+		value.append(rh1)
+		
+		return tuple(value)	
+
 class BLC(Qualification):
 	
 	def __init__(self,code,cycle='D'):
@@ -461,14 +530,14 @@ class BLC(Qualification):
 		if v1[0] == v0[0]:
 			return (None,)
 		value.append(self.d_data[v1[0]][4])
-		mi = min([l for d,o,h,l,c,a,v in self.d_data[v1[0]:v0[0]]])
-		ma = max([h for d,o,h,l,c,a,v in self.d_data[v1[0]:v0[0]]])
+		mi = min([l for d,o,h,l,c,a,v in self.d_data[v1[0]:v0[0]+1]])
+		ma = max([h for d,o,h,l,c,a,v in self.d_data[v1[0]:v0[0]+1]])
 		value.append(ma)
 		value.append(mi)
 		value.append(self.d_data[v0[0]][4])
 		vol = 0
 		amount = 0.0
-		for dta in self.d_data[v1[0]:v0[0]]:
+		for dta in self.d_data[v1[0]:v0[0]+1]:
 			vol += dta[6]
 			amount += dta[5]
 		value.append(amount)
