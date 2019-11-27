@@ -418,19 +418,32 @@ class Qualification:
 		pass
 	
 	@abstractmethod
-	def calcValue(self,input_index):
+	def calcValue(self,input_index,d_data = None,q_data = None):
 		'''计算技术值'''
 		pass
 	
-	def getCurrent(self,cur):
+	def getCurrent(self,cur,mid=False):
 		default = None
 		if len(self.d_data) == 0:
 			return default
 		if len(self.q_data) == 0:
 			return default
 		
-		self.d_data.append(cur)
-		rtn = self.calcValue(len(self.d_data)-1)
+		d_data = self.d_data
+		q_data = self.q_data
+		index = (len(self.d_data)-1)
+		if mid:
+			for d in self.d_data:
+				if d[0] == cur[0]:
+					index = (self.d_data.index(d))
+					d_data = self.d_data[:index]
+					break
+			for q in self.q_data:
+				if q[0] == cur[0]:
+					q_data = self.q_data[:self.q_data.index(q)]
+					break
+		d_data.append(cur)
+		rtn = self.calcValue(index,d_data,q_data)
 		return rtn
 	
 	def getValues(self):
@@ -454,9 +467,13 @@ class RNG(Qualification):
 		self.kdjdata = kdjfile.getValues()
 		pass
 
-	def calcValue(self,index):
-		d_date = self.d_data[index][0]
-		d_close = self.d_data[index][4]
+	def calcValue(self,index,d_data=None,q_data=None):
+		if d_data == None:
+			d_data = self.d_data
+		if q_data == None:
+			q_data = self.q_data
+		d_date = d_data[index][0]
+		d_close = d_data[index][4]
 		value = [d_date,d_close]
 		kdjindex = getIndexOfSerial(self.kdjdata,d_date)
 		if kdjindex == -1:
@@ -521,23 +538,27 @@ class BLC(Qualification):
 			self.dfile = WeeklyFile(code,cqcx=False)
 			self.d_data = self.dfile.getData()
 
-	def calcValue(self,index):
-		value = [self.d_data[index][0],]
-		v0 = VLV(self.d_data,index,5,3)
+	def calcValue(self,index,d_data=None,q_data=None):
+		if d_data == None:
+			d_data = self.d_data
+		if q_data == None:
+			q_data = self.q_data
+		value = [d_data[index][0],]
+		v0 = VLV(d_data,index,5,3)
 		if v0[0] == index:
 			return (None,)
-		v1 = VLV(self.d_data,v0[0],5,3)
+		v1 = VLV(d_data,v0[0],5,3)
 		if v1[0] == v0[0]:
 			return (None,)
-		value.append(self.d_data[v1[0]][4])
-		mi = min([l for d,o,h,l,c,a,v in self.d_data[v1[0]:v0[0]+1]])
-		ma = max([h for d,o,h,l,c,a,v in self.d_data[v1[0]:v0[0]+1]])
+		value.append(d_data[v1[0]][4])
+		mi = min([l for d,o,h,l,c,a,v in d_data[v1[0]:v0[0]+1]])
+		ma = max([h for d,o,h,l,c,a,v in d_data[v1[0]:v0[0]+1]])
 		value.append(ma)
 		value.append(mi)
-		value.append(self.d_data[v0[0]][4])
+		value.append(d_data[v0[0]][4])
 		vol = 0
 		amount = 0.0
-		for dta in self.d_data[v1[0]:v0[0]+1]:
+		for dta in d_data[v1[0]:v0[0]+1]:
 			vol += dta[6]
 			amount += dta[5]
 		value.append(amount)
@@ -556,14 +577,18 @@ class MA(Qualification):
 			self.dfile = WeeklyFile(code,cqcx=False)
 			self.d_data = self.dfile.getData()
 
-	def calcValue(self,index):
+	def calcValue(self,index,d_data=None,q_data=None):
+		if d_data == None:
+			d_data = self.d_data
+		if q_data == None:
+			q_data = self.q_data
 		level = [5,18,30,60]
-		value = [self.d_data[index][0],]
+		value = [d_data[index][0],]
 		for li in range(0,len(level)):
 			if level[li] <= index:
 				sum = 0.0
 				for i in range(index-level[li]+1,index+1):
-					sum = sum + self.d_data[i][4]
+					sum = sum + d_data[i][4]
 				value.append(round((sum/level[li]),2))
 			else:
 				value.append(None)
@@ -576,14 +601,18 @@ class STMA(Qualification):
 		self.dfile = StackFile(code)
 		self.d_data = self.dfile.getData()
 	
-	def calcValue(self,index):
+	def calcValue(self,index,d_data=None,q_data=None):
+		if d_data == None:
+			d_data = self.d_data
+		if q_data == None:
+			q_data = self.q_data
 		level = [5,18,30,60]
-		value = [self.d_data[index][0],]
+		value = [d_data[index][0],]
 		for li in range(0,len(level)):
 			if level[li] <= index:
 				sum = 0.0
 				for i in range(index-level[li]+1,index+1):
-					sum = sum + self.d_data[i][1]
+					sum = sum + d_data[i][1]
 				value.append(round((sum/level[li]),2))
 			else:
 				value.append(None)
@@ -606,32 +635,36 @@ class KDJ(Qualification):
 			self.d_data = self.dfile.getData()
 
 		
-	def calcValue(self,index):
+	def calcValue(self,index,d_data=None,q_data=None):
+		if d_data == None:
+			d_data = self.d_data
+		if q_data == None:
+			q_data = self.q_data
 		if self.cycle == 'W':
-			d_data = []
-			d_data.append(self.d_data[index])
+			temp_d = []
+			temp_d.append(d_data[index])
 			for i in range(index-1,-1,-1):
-				if d_data[0][0].strftime('%W') != self.d_data[i][0].strftime('%W'):
-					d_data.insert(0,self.d_data[i])
-					if len(d_data) > 9:
+				if d_data[0][0].strftime('%W') != d_data[i][0].strftime('%W'):
+					temp_d.insert(0,d_data[i])
+					if len(temp_d) > 9:
 						break
 		else:
-			d_data = []
+			temp_d = []
 			for i in range(index,-1,-1):
-				d_data.insert(0,self.d_data[i])
-				if len(d_data)>9:
+				temp_d.insert(0,d_data[i])
+				if len(temp_d)>9:
 					break
-		q_data = self.q_data + self.appends
-		if len(d_data) < 9:
+		#q_data = q_data + self.appends
+		if len(temp_d) < 9:
 			return (d_data[-1][0],None,None,None,None)
 
-		hhv = d_data[-1][2]
-		llv = d_data[-1][3]
-		for i in range(len(d_data)-9,len(d_data)):
-			if d_data[i][2]>hhv:
-				hhv = d_data[i][2]
-			if d_data[i][3]<llv:
-				llv = d_data[i][3]
+		hhv = temp_d[-1][2]
+		llv = temp_d[-1][3]
+		for i in range(len(temp_d)-9,len(temp_d)):
+			if temp_d[i][2]>hhv:
+				hhv = temp_d[i][2]
+			if temp_d[i][3]<llv:
+				llv = temp_d[i][3]
 		
 		if hhv == llv:
 			return (d_data[-1][0],None,None,None,None)
@@ -676,16 +709,20 @@ class MACD(Qualification):
 			self.d_data = self.dfile.getData()
 
 		
-	def calcValue(self,index):
-		q_data = self.q_data + self.appends
-		c = self.d_data[index][4]
+	def calcValue(self,index,d_data=None,q_data=None):
+		#q_data = self.q_data + self.appends
+		if d_data == None:
+			d_data = self.d_data
+		if q_data == None:
+			q_data = self.q_data
+		c = d_data[index][4]
 
 		pre_ema12 = 0
 		pre_ema26 = 0
 		pre_dea = 0
 		if self.cycle == 'W':
 			for i in range(len(q_data)-1,-1,-1):
-				if q_data[i][0].strftime('%W') != self.d_data[index][0].strftime('%W'):
+				if q_data[i][0].strftime('%W') != d_data[index][0].strftime('%W'):
 					pre_ema12 = q_data[i][1]
 					pre_ema26 = q_data[i][2]
 					pre_dif = q_data[i][3]
@@ -693,7 +730,7 @@ class MACD(Qualification):
 			
 		elif self.cycle == 'M':
 			for i in range(len(q_data)-1,-1,-1):
-				if q_data[i][0].strftime('%M') != self.d_data[index][0].strftime('%M'):
+				if q_data[i][0].strftime('%M') != d_data[index][0].strftime('%M'):
 					pre_ema12 = q_data[i][1]
 					pre_ema26 = q_data[i][2]
 					pre_dea = q_data[i][4]
@@ -710,15 +747,19 @@ class MACD(Qualification):
 		
 		macd = (dif-dea)*2.0
 		#print((d_data[-1][0],rsv,k,d,j))
-		return (self.d_data[index][0],ema12,ema26,dif,dea,macd)
+		return (d_data[index][0],ema12,ema26,dif,dea,macd)
 	
 class LVL(Qualification):
 	def __init__(self,code,cqcx = False):
 		Qualification.__init__(self,code,'LVL',cqcx)
 		
-	def calcValue(self,index):
+	def calcValue(self,index,d_data=None,q_data=None):
+		if d_data == None:
+			d_data = self.d_data
+		if q_data == None:
+			q_data = self.q_data
 		if index < 10:
-			return (self.d_data[index][0],None,None,None)
+			return (d_data[index][0],None,None,None)
 			
 		kt1 = self.getKValue(index)
 		if kt1 != None:
@@ -727,8 +768,8 @@ class LVL(Qualification):
 				kv = self.checkKValue(kt2,index)
 				if kv != None:
 					#data
-					return (self.d_data[index][0],kv,index-kt2[3],kt2[1])
-		return (self.d_data[index][0],None,None,None)
+					return (d_data[index][0],kv,index-kt2[3],kt2[1])
+		return (d_data[index][0],None,None,None)
 		
 	def getKValue(self,index):
 		k = 0
