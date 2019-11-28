@@ -65,6 +65,11 @@ def testShowDict():
 	showDict(dic)
 	pass
 
+def showInOneLine(text):
+	print("\r" + " "*int(1.1*len(text)),end='')
+	print("\r"+text,end='')
+	pass
+
 if __name__ == '__main__':
 	testShowDict()
 	

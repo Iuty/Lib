@@ -5,12 +5,16 @@ class SimuTrader:
 	def __init__(self,code,methodmark,dismark):
 		self._trade = []
 		self._data = []
-		self._file = SimTradeFile(' ',"{}_{}".format(methodmark,dismark))
-		self._file.removeFiles()
+		self._method = methodmark
+		self._dis = dismark
 		self._file = SimTradeFile(code,"{}_{}".format(methodmark,dismark))
 		self._cqcxdata = CqcxFile(code).getData()
 		pass
-
+	
+	@property
+	def Empty(self):
+		return len(self._trade) == 0
+	
 	@property
 	def Hold(self):
 		return len(self._trade) == 2
@@ -68,4 +72,8 @@ class SimuTrader:
 		if len(self._data) > 0:
 			self._file.appendData(self._data)
 		pass
+	
+	def deleteFiles(self):
+		s_file = SimTradeFile(' ',"{}_{}".format(self._method,self._dis))
+		s_file.removeFiles()
 
