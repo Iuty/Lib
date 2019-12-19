@@ -25,10 +25,12 @@ class SimuTrader:
 	
 	
 
-	def simuBuy(self,price,daily,tex = 1.0015):
+	def simuBuy(self,price,daily,tex = 1.0003):
 		if self.Hold:
 			return
 		else:
+			if price == daily[2]:
+				return
 			if price < daily[3]:
 				return
 			if price > daily[2]:
@@ -37,10 +39,12 @@ class SimuTrader:
 			self._trade.append(price*tex)
 		pass
 
-	def simuSell(self,price,daily,tex = 0.9975):
+	def simuSell(self,price,daily,tex = 0.9987):
 		if not self.Hold:
 			return
 		else:
+			if price == daily[3]:
+				return
 			if price > daily[2]:
 				return
 			if price < daily[3]:
@@ -49,16 +53,20 @@ class SimuTrader:
 			self._trade.append(price*tex)
 		pass
 
-	def setParams(self,reason,params):
+	def setParams(self,reason,params,holdlimit = 19):
 		if self.Fin:
 			self._trade.append(reason)
 			self._trade+=params
-			if not self.delCqcx():
+			if (not self.delCqcx()) & (not self.delLongHold(holdlimit)):
 				self._data.append(tuple(self._trade))
 			self._trade = []
 		pass
-
-
+	
+	def delLongHold(self,holdlimit):
+		if len(self._trade) >= 4:
+			if (self._trade[2] - self._trade[0]).days > holdlimit:
+				return True
+		return False
 
 	def delCqcx(self):
 		if len(self._trade) >= 4:

@@ -567,7 +567,34 @@ class BLC(Qualification):
 		value.append(v0[0])
 
 		return tuple(value)	
+
+class DLT(Qualification):
 	
+	def __init__(self,code,cycle='D'):
+		Qualification.__init__(self,code,'Dlt'+'_'+cycle,cqcx=False)
+		self.cycle = cycle
+		if cycle == 'W':
+			self.dfile = WeeklyFile(code,cqcx=False)
+			self.d_data = self.dfile.getData()
+
+	def calcValue(self,index,d_data=None,q_data=None):
+		if d_data == None:
+			d_data = self.d_data
+		if q_data == None:
+			q_data = self.q_data
+		level = [5,10,30,60]
+		value = [d_data[index][0],]
+		for li in range(0,len(level)):
+			if 2*level[li] <= index:
+				v = 0.0
+				for ii in range(0,level[li]):
+					v +=(d_data[index-ii][4] - d_data[index-ii-level[li]][4])/level[li]
+				av = v/level[li]
+				value.append(av)
+			else:
+				value.append(None)
+		return tuple(value)
+
 class MA(Qualification):
 	
 	def __init__(self,code,cycle='D'):
