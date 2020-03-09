@@ -394,6 +394,7 @@ class Qualification:
 			
 			filter = False
 			append = self.calcValue(i)
+			self.q_data.append(append)
 			for appenditem in append:
 				if type(appenditem) == type(None):
 					filter = True
@@ -413,8 +414,8 @@ class Qualification:
 			return
 
 		self.qfile.appendData(appends)
-		for append in appends:
-			self.q_data.append(append)
+		#for append in appends:
+			#self.q_data.append(append)
 		pass
 	
 	@abstractmethod
@@ -526,6 +527,41 @@ class RNG(Qualification):
 		value.append(rh0)
 		value.append(rl1)
 		value.append(rh1)
+		
+		return tuple(value)	
+
+class DTMA(Qualification):
+	def __init__(self,code,cycle='D'):
+		Qualification.__init__(self,code,'dmt'+'_'+cycle,cqcx=False)
+		self.cycle = cycle
+		if cycle == 'W':
+			self.dfile = WeeklyFile(code,cqcx=False)
+			self.d_data = self.dfile.getData()
+		mafile = MA(code,cycle)
+		self.madata = mafile.getValues()
+		pass
+
+	def calcValue(self,index,d_data=None,q_data=None):
+		if d_data == None:
+			d_data = self.d_data
+		if q_data == None:
+			q_data = self.q_data
+		d_date = d_data[index][0]
+		d_close = d_data[index][4]
+		value = [d_date,d_close]
+		maindex = getIndexOfSerial(self.madata,d_date)
+		if maindex == -1:
+			return (None,)
+		ma = self.madata[maindex]
+		r1 = 1/(1/5)*((1/5*ma[1]))
+		r2 = 1/(1/5+1/10)*((1/5*ma[1])+(1/10*ma[2]))
+		r3 = 1/(1/5+1/10+1/30)*((1/5*ma[1])+(1/10*ma[2])+(1/30*ma[3]))
+		r4 = 1/(1/5+1/10+1/30+1/60)*((1/5*ma[1])+(1/10*ma[2])+(1/30*ma[3])+(1/60*ma[4]))
+		
+		value.append(r1)
+		value.append(r2)
+		value.append(r3)
+		value.append(r4)
 		
 		return tuple(value)	
 
@@ -763,13 +799,15 @@ class MACD(Qualification):
 					pre_dea = q_data[i][4]
 					break
 		else:
-			if len(q_data) > 0:
+			if len(q_data) > 1:
 				pre_ema12 = q_data[-1][1]
 				pre_ema26 = q_data[-1][2]
 				pre_dif = q_data[-1][3]
+				pre_dea = q_data[-1][4]
 		ema12 = EMA(pre_ema12,c,12)
 		ema26 = EMA(pre_ema26,c,26)
 		dif = ema12 - ema26
+		#print(pre_dea)
 		dea = EMA(pre_dea,dif,9)
 		
 		macd = (dif-dea)*2.0

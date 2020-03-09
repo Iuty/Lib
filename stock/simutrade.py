@@ -9,6 +9,7 @@ class SimuTrader:
 		self._dis = dismark
 		self._file = SimTradeFile(code,"{}_{}".format(methodmark,dismark))
 		self._cqcxdata = CqcxFile(code).getData()
+		self._code = code
 		pass
 	
 	@property
@@ -53,7 +54,7 @@ class SimuTrader:
 			self._trade.append(price*tex)
 		pass
 
-	def setParams(self,reason,params,holdlimit = 19):
+	def setParams(self,reason,params,holdlimit = 270):
 		if self.Fin:
 			self._trade.append(reason)
 			self._trade+=params
@@ -65,6 +66,8 @@ class SimuTrader:
 	def delLongHold(self,holdlimit):
 		if len(self._trade) >= 4:
 			if (self._trade[2] - self._trade[0]).days > holdlimit:
+				#print(' ')
+				#print(self._trade)
 				return True
 		return False
 
@@ -72,7 +75,7 @@ class SimuTrader:
 		if len(self._trade) >= 4:
 			for cqcx in self._cqcxdata:
 				if (cqcx[0] >= self._trade[0]) & (cqcx[0] <= self._trade[2]):
-					
+					#print('del cqcx code:{},date:{}'.format(self._code,cqcx[0]))
 					return True
 		return False
 
