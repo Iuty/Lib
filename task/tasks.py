@@ -5,6 +5,65 @@ from timeutil import getTimeTamp
 from mutithread.threads import SubThread
 import config
 
+class TaskProxy:
+	"""
+	for single thread
+	"""
+	def __init__(self):
+		self.__todo__ = []
+		self.__finished__ = []
+		self._task_ = None
+		pass
+
+	def addTask(self,task):
+		self.__todo__.append(task)
+		pass
+
+	def removeTask(self,taskname):
+		rtn = False
+		for ti in self.__todo__:
+			if ti._name_ = taskname:
+				self.__todo__.remove(ti)
+				rtn = True
+				break
+		return rtn
+
+	@property
+	def Process(self):
+		p = 0
+		if (len(self.__todo__) + len(self.__finished__)) > 0:
+			p = len(self.__finished__)/(len(self.__todo__) + len(self.__finished__))
+		return p
+
+	def runTask(self):
+		if self._task_ == None:
+			self._task_ = self.__todo__.pop()
+		if self._task_ != None:
+			self._task_.runTask.__call__()
+		if self._task_.Process = 1:
+			self.__finished__.append(self._task_)
+			self._task_ = None
+		pass
+		
+	
+
+class Task:
+	"""
+	
+	"""
+	_start = 0
+	_end = 1
+
+	@property
+	def Process(self):
+		return _start/_end
+
+	#need override
+	def runTask(self):
+		pass
+	
+
+
 class SingleTaskManager:
 	def __init__(self,name,startmark,filepath = './/config//'):
 		self.name = name

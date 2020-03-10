@@ -1,2 +1,1 @@
-# Lib
-my basic lib source code, include some common utility 
+#it is a common util dll copy right with iuty
