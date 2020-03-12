@@ -1,145 +1,205 @@
-from task.tasks import TaskProxy,Task
-import requests,json
+#from task.tasks import TaskProxy,Task
+from flask import request
+import requests
+import json
+import os
+from file.info import FileInfo,DirInfo
+from commonutil.config import Config
+from task.tasks import TaskItem,TaskProxy
+import base64
 
-class Server:
-	"""
-	client download from server
-	"""
-	def getFullPath(namespace,path):
-		if namespace == None:
-			#root is None => path is full path
-			return os.path.join("./" ,path)
-		else:
-			#root not None => path is rel path,find root at os.path
-			if not namespace in os.sys.path:
-				raise Exception("{} not in system path".format(namespace))
-			return os.path.join(os.sys.path[namespace],path)
+class FileServer:
+    """
+    client download from server
+    """
+    
+    def getFullPath(namespace,path):
+        if namespace == None:
+            #root is None => path is full path
+            return os.path.join("./" ,path)
+        else:
+            #root not None => path is rel path,find root at os.path
+            realdir = Config.get("FileServer",namespace)
+            
+            if realdir is None:
+                raise Exception("{} not in system path".format(namespace))
+            return os.path.join(realdir,path)
 
-	def getDir(namespace,path,filter = [],choise = []):
-		rtn = {"exists":False}
-		fullpath = getFullPath(namespace,path)
-		if os.path.exists(path):
-			rtn["exists"] = True
-			rtn["dirs"] = []
-			rtn["files"] = []
-			for root,dirs,files in os.walk(fullpath):
-				for dir in dirs:
-					if root != path:
-						continue
-					rtn["dirs"].append(dir)
-				for file in files:
-					if root != path:
-						continue
-					ext = file.split('.')[-1]
-					if len(filter) > 0:
-						if ext in filter:
-							continue
-					if len(choise) > 0:
-						if not (ext in choise):
-							continue
-					rtn["files"].append(file)
+    def getDir(namespace,path,filter = [],choise = []):
+        dpath = FileServer.getFullPath(namespace,path)
+        dir = DirInfo(dpath)
+        return dir.getFilesName()
+        '''
+        
+        '''
 
-		return rtn
+    def getFileStream(namespace,path,filename,start,slice = 128000):
+        rtn = {"exists":False}
+        dirpath = FileServer.getFullPath(namespace,path)
+        fi = FileInfo(dirpath,filename)
+        if not fi.Exists:
+            return rtn
+        rtn = fi.getFileStream(start,slice)
+        
+        return rtn
 
-	def getFile(namespace,path,filename,start,slice = 1000):
-		rtn = {"exists":False}
-		dirpath = getFullPath(namespace,path)
-		fpath = os.path.join(dirpath,filename)
-		if os.path.exists(fpath):
-			rtn["exists"] = True
-			
-			rtn["start"] = start
-			
-			f = open(fpath,"rb")
-			f.read(start)
-			rtn["data"] = f.read(slice)
+    """
+    client upload to server
+    """
+    def setFileStream(namespace,path,filename,start,data):
+        rtn = {"success":False}
+        dirpath = FileServer.getFullPath(namespace,path)
+        
+        fi = FileInfo(dirpath,filename)
+        #if not fi.Exists:
+            #return rtn
+        rtn = fi.setFileStream(start,data)
+        return rtn
+    
+    def catchFileApi():
+        namespace = request.json.get("namespace")
+        path = request.json.get("path")
+        filename = request.json.get("filename")
+        start = request.json.get("start")
+        data = request.json.get("data")
+        #print(bytes(data,"utf-8"))
+        rtn = FileServer.setFileStream(namespace,path,filename,int(start),base64.b64decode(bytes(data,"utf-8")))
+        return json.dumps(rtn)
+        pass
+    
+    def fetchFileApi():
+        namespace = request.json.get("namespace")
+        path = request.json.get("path")
+        filename = request.json.get("filename")
+        start = request.json.get("start")
+        batch = request.json.get("batch")
+        
+        rtn = FileServer.getFileStream(namespace,path,filename,int(start))
+        #print(rtn["data"])
+        rtn["data"] = str(base64.b64encode(rtn["data"]),"utf-8")
+        return json.dumps(rtn)
+        pass
+    pass
 
-			rtn["surplus"] = len(f.read())
-		return rtn
+class TransFileTask(TaskItem):
+    def __init__(self,namespace,local,path,fname,type):
+        self._namespace = namespace
+        self._local = local
+        self._path = path
+        self._filename = fname
+        self._type = type
+        TaskItem.__init__(self,os.path.join(local,path,fname))
+        pass
+    
+    @property
+    def Type(self):
+        return self._type
+    
+    @property
+    def NameSpace(self):
+        return self._namespace
+    
+    @property
+    def Local(self):
+        return self._local
+    
+    @property
+    def Path(self):
+        return self._path
+    
+    @property
+    def FileName(self):
+        return self._filename
+    pass
+    
 
-	"""
-	client upload to server
-	"""
-	def setFile(root,path,filename,start,data,format = "utf-8"):
-		rtn = {"success":False}
-		if root in os.sys.path:
-			dpath = os.path.join(os.sys.path[root],path)
-			if not os.path.exists(dpath):
-				os.mkdir(dpath)
-			fpath = os.path.join(dpath,filename)
-			f = open("fpath","ab+")
-			if len(f.read()) != start:
-				rtn['err'] = "start is not match with local file"
-				return rtn
-			f.write(bytes(data,format))
-			f.close()
-			rtn['success']=True
-		return rtn
+class Client(TaskProxy):
+    def __init__(self,url = "http://127.0.0.1:7001/download"):
+        self._url = url
+        self._task = None
+        
+        TaskProxy.__init__(self)
+        
+        pass
+    
+    def uploadFileStream(self,namespace,local,path,fname,start=0,batch = 128000):
+            
+        fi = FileInfo(local,fname)
+        fs = fi.getFileStream(start,batch)
+        fsdata = base64.b64encode(fs["data"])
+        data = {'namespace':namespace,'path':path,'local':local,'filename':fname,'start':start,'data':str(fsdata,"utf-8")}
+        
+        headers = {'Content-Type':'application/json'}
+        response = requests.post(url=self._url,headers = headers, data = json.dumps(data))
+        result = json.loads(response.text)
+        result["surplus"] = fs["surplus"]
+        return result
 
-	pass
+    def downloadFileStream(self,namespace,local,path,fname,start=0,batch = 128000):
+        
+        data = {'namespace':namespace,'path':path,'local':local,'filename':fname,'start':start}
+        headers = {'Content-Type':'application/json'}
+        response = requests.post(url=self._url,headers = headers, data = json.dumps(data))
+        
+        fi = FileInfo(local,fname)
+        
+        result = json.loads(response.text)
+        
+        if result["success"]:
+            dt = base64.b64decode(bytes(result.pop("data"),"utf-8"))
+            rst = fi.setFileStream(start,dt)
+            result["size"] = rst["size"]
+        return result
+    
+    def uploadFile(self,namespace,local,path,filename):
+        self.addTask(TransFileTask(namespace,local,path,filename,"upload"))
+        pass
+    
+    def downloadFile(self,namespace,local,path,filename):
+        self.addTask(TransFileTask(namespace,local,path,filename,"download"))
+        pass
 
-class TransFile(Task):
-	_format = "utf-8"
-	_local = "./"
-	def __init__(self,remote,path,filename):
-		Task.__init__(self)
-		self._remote = remote
-		self._path = path
-		self._filename = filename
-		pass
+    def runTask(self):
+        if self._task == None:
+            self._task = self.getTask()
+            
+        if self._task != None:
+            tsk = self._task
+            if tsk.Type == "upload":
+                rst = self.uploadFileStream(tsk.NameSpace,tsk.Local,tsk.Path,tsk.FileName,tsk.Start)
+                if rst["success"]:
+                    tsk.Start = rst["size"]
+                    tsk.To = rst["surplus"]
+                    
+                    if tsk.Process == 1:
+                        self.finTask(tsk)
+                        self._task = None
+                else:
+                    self._task = None
+            elif tsk.Type == "download":
+                rst = self.downloadFileStream(tsk.NameSpace,tsk.Local,tsk.Path,tsk.FileName,tsk.Start)
+                if rst["success"]:
+                    tsk.Start = rst["size"]
+                    tsk.To = rst["surplus"]
+                    
+                    if tsk.Process == 1:
+                        self.finTask(tsk)
+                        self._task = None
+                else:
+                    self._task = None
+                pass
+                
+            return
+        
+        pass
 
-	@property
-	def Name(self):
-		return os.path.join(self._local,self._path,self._filename)
-
-	def writeFile(self,data,start):
-		rtn = True
-		dpath = os.path.join(self._local,self._path)
-		if not os.path.exists(dpath):
-			os.mkdir(dpath)
-		fpath = os.path.join(dpath,self._filename)
-		f = open("fpath","ab+")
-		if len(f.read()) != start:
-			rtn = False
-
-		f.write(bytes(data,self._format))
-		f.close()
-		return rtn
-
-	def readFile(self,start,lenth):
-		fname = os.path.join(self._local,self._path,self._filename)
-		if not os.path.exists(fname):
-			return bytes('',self._format)
-		f = open(fname,"rb")
-		f.read(start)
-		data = f.read(lenth)
-		f.close()
-		return data
-
-	
-
-
-class UploadClient(TaskProxy):
-	def __init__(self,url = "127.0.0.1:7000/filesys"):
-		self._url = url
-		TaskProxy.__init__(self)
-		pass
-	
-	def getDir(self,remote,path):
-
-
-	def runTask():
-		self._task.setFile(self._url)
-		pass
-
-class DownloadClient(TaskProxy):
-	def __init__(self,url = "127.0.0.1:7000/filesys"):
-		self._url = url
-		TaskProxy.__init__(self)
-		pass
-		
-	def runTask():
-		self._task.getFile()
-		pass
-
-
+if __name__ == "__main__":
+    uc = Client()
+    #print(uc.uploadFileStream("test",r"d:/back/local","","123.txt",0))
+    #print(uc.downloadFileStream("test",r"d:/back/local","","123.txt"))
+    uc.downloadFile("test",r"d:/back/local","","1-160521014039.pdf")
+    uc.runTask()
+    while (uc._task != None):
+        
+        uc.runTask()
+        print(100.0*uc.Process)
