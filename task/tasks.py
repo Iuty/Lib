@@ -55,8 +55,9 @@ class TaskItem:
     """
     _start = 0
     _to = 1
-    def __init__(self,name):
+    def __init__(self,name,type):
         self._name = name
+        self._type = type
         pass
     
     @property
@@ -82,6 +83,10 @@ class TaskItem:
     @property
     def Name(self):
         return self._name
+    
+    @property
+    def Type(self):
+        return self._type
     
     @property
     def Process(self):

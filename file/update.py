@@ -87,13 +87,8 @@ class TransFileTask(TaskItem):
         self._local = local
         self._path = path
         self._filename = fname
-        self._type = type
-        TaskItem.__init__(self,os.path.join(local,path,fname))
+        TaskItem.__init__(self,os.path.join(local,path,fname),type)
         pass
-    
-    @property
-    def Type(self):
-        return self._type
     
     @property
     def NameSpace(self):
@@ -111,7 +106,28 @@ class TransFileTask(TaskItem):
     def FileName(self):
         return self._filename
     pass
+
+class TransDirTask(TaskItem):
+    def __init__(self,namespace,local,path,type):
+        self._namespace = namespace
+        self._local = local
+        self._path = path
+        TaskItem.__init__(self,os.path.join(local,path),type)
+        pass
     
+    @property
+    def NameSpace(self):
+        return self._namespace
+    
+    @property
+    def Local(self):
+        return self._local
+    
+    @property
+    def Path(self):
+        return self._path
+    
+    pass
 
 class Client(TaskProxy):
     def __init__(self,url = "http://127.0.0.1:7001/download"):
@@ -127,7 +143,7 @@ class Client(TaskProxy):
         fi = FileInfo(local,fname)
         fs = fi.getFileStream(start,batch)
         fsdata = base64.b64encode(fs["data"])
-        data = {'namespace':namespace,'path':path,'local':local,'filename':fname,'start':start,'data':str(fsdata,"utf-8")}
+        data = {'cmd':"updateFileStream",'namespace':namespace,'path':path,'local':local,'filename':fname,'start':start,'data':str(fsdata,"utf-8")}
         
         headers = {'Content-Type':'application/json'}
         response = requests.post(url=self._url,headers = headers, data = json.dumps(data))
@@ -137,7 +153,7 @@ class Client(TaskProxy):
 
     def downloadFileStream(self,namespace,local,path,fname,start=0,batch = 128000):
         
-        data = {'namespace':namespace,'path':path,'local':local,'filename':fname,'start':start}
+        data = {'cmd':"downloadFileStream",'namespace':namespace,'path':path,'local':local,'filename':fname,'start':start}
         headers = {'Content-Type':'application/json'}
         response = requests.post(url=self._url,headers = headers, data = json.dumps(data))
         
