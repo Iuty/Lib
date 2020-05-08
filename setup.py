@@ -1,5 +1,5 @@
 from setuptools import setup
-from Iuty.commonutil.Config import Config
+from IutyLib.commonutil.Config import Config
 
 config = Config("./Config.conf")
 ver = config.get("Version","ver")
