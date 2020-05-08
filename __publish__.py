@@ -1,7 +1,6 @@
 from IutyLib.commonutil.config import Config
 import datetime
 
-
 if __name__ == "__main__":
     dt = datetime.datetime.now()
     yy = dt.strftime("%y")
@@ -9,6 +8,6 @@ if __name__ == "__main__":
     HHMM = dt.strftime("%H%M")
 
     config = Config("./Config.conf")
-    print(config.get("Version","subver"))
+    
     config.set("Version","subver","{}.{}.{}".format(yy,mmdd,HHMM))
     pass
