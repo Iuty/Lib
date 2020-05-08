@@ -1,13 +1,19 @@
 from setuptools import setup
-from IutyLib.commonutil.Config import Config
+import os
+version = "1.0"
+if os.path.exists("/IutyLib/commonutil/Config.py"):
+    print("123")
+    from IutyLib.commonutil.config import Config
 
-config = Config("./Config.conf")
-ver = config.get("Version","ver")
-subver = config.get("Version","subver")
+    config = Config("./Config.conf")
+    ver = config.get("Version","ver")
+    subver = config.get("Version","subver")
+    version= "{}.{}".format(ver,subver)
+    pass
 
 setup(
     name="IutyLib",
-    version= "{}.{}".format(ver,subver),
+    version= version,
     #version = ver,
     packages=[
         #"IutyLib",
