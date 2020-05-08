@@ -1,18 +1,14 @@
 from setuptools import setup
-import datetime
+from Iuty.commonutil.Config import Config
 
-v = "1"
-ver = "1.0.0"
-dt = datetime.datetime.now()
-yy = dt.strftime("%y")
-mmdd = dt.strftime("%m%d")
-HHMM = dt.strftime("%H%M")
-
+config = Config("./Config.conf")
+ver = config.get("Version","ver")
+subver = config.get("Version","subver")
 
 setup(
     name="IutyLib",
-    #version= v + "." + yy + "." + mmdd + "." + HHMM,
-    version = ver,
+    version= "{}.{}".format(ver,subver),
+    #version = ver,
     packages=[
         #"IutyLib",
         "IutyLib.commonutil",

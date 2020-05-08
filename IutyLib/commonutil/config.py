@@ -23,7 +23,19 @@ def savePickleData(path,memery):
     f.close()
     
 class Config:
-    def get(session,key):
-        config = configparser.ConfigParser()
-        config.read("./Config/Config.conf")
-        return config.get(session,key)
+    def __init__(self,path="./Config/Config.conf"):
+        self._path = path
+        self._config = configparser.ConfigParser()
+        self._config.read(self._path)
+        pass
+        
+    def get(self,session,key):
+        return self._config.get(session,key)
+    
+    def set(self,session,key,val):
+        self._config.set(session,key,val)
+        
+        with open(self._path,'w') as f:
+            self._config.write(f)
+        self._config.read(self._path)
+        pass
