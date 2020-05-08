@@ -11,8 +11,8 @@ HHMM = dt.strftime("%H%M")
 
 setup(
     name="IutyLib",
-    version= v + "." + yy + "." + mmdd + "." + HHMM,
-    #version = ver,
+    #version= v + "." + yy + "." + mmdd + "." + HHMM,
+    version = ver,
     packages=[
         #"IutyLib",
         "IutyLib.commonutil",
