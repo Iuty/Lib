@@ -1,5 +1,5 @@
-from stock.files import BlockFile,VLevelFile,DailyFile
-from stock.qualification import VLs,VHs
+from IutyLib.stock.files import BlockFile,VLevelFile,DailyFile
+from IutyLib.stock.qualification import VLs,VHs
 
 class Block:
 	from abc  import abstractmethod
