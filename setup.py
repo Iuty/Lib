@@ -26,5 +26,6 @@ setup(
         "IutyLib.framework",
         "IutyLib.encription",
         "IutyLib.show",
+        "IutyLib.mutithread",
         ]
 )
