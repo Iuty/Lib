@@ -25,5 +25,6 @@ setup(
         "IutyLib.monitor",
         "IutyLib.framework",
         "IutyLib.encription",
+        "IutyLib.show",
         ]
 )
