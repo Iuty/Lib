@@ -1,3 +1,3 @@
-from stock.files import *
-from stock.qualification import *
-from stock.block import *
+from IutyLib.stock.files import *
+from IutyLib.stock.qualification import *
+from IutyLib.stock.block import *
