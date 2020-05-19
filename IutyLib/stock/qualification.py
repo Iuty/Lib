@@ -1,4 +1,4 @@
-from stock.files import QualifyFile, HourFile,QuarterFile, DailyFile, WeeklyFile, CqcxDailyFile,StackFile
+from IutyLib.stock.files import QualifyFile, HourFile,QuarterFile, DailyFile, WeeklyFile, CqcxDailyFile,StackFile
 
 '''
 Qualify Method
