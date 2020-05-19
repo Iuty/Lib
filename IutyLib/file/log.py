@@ -1,4 +1,4 @@
-from file.files import StringFile
+from IutyLib.file.files import StringFile
 import os,datetime,threading
 
 class Log(StringFile):
