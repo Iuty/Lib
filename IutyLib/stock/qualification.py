@@ -709,21 +709,21 @@ class KDJ(Qualification):
 			for i in range(index-1,-1,-1):
 				if d_data[0][0].strftime('%W') != d_data[i][0].strftime('%W'):
 					temp_d.insert(0,d_data[i])
-					if len(temp_d) > 9:
+					if len(temp_d) > 81:
 						break
 		else:
 			temp_d = []
 			for i in range(index,-1,-1):
 				temp_d.insert(0,d_data[i])
-				if len(temp_d)>9:
+				if len(temp_d)>81:
 					break
 		#q_data = q_data + self.appends
-		if len(temp_d) < 9:
+		if len(temp_d) < 81:
 			return (d_data[-1][0],None,None,None,None)
 
 		hhv = temp_d[-1][2]
 		llv = temp_d[-1][3]
-		for i in range(len(temp_d)-9,len(temp_d)):
+		for i in range(len(temp_d)-81,len(temp_d)):
 			if temp_d[i][2]>hhv:
 				hhv = temp_d[i][2]
 			if temp_d[i][3]<llv:
@@ -755,9 +755,9 @@ class KDJ(Qualification):
 				pre_k = q_data[-1][2]
 				pre_d = q_data[-1][3]
 		
-		k = SMA(pre_k,rsv,3,1)
+		k = SMA(pre_k,rsv,18,1)
 		
-		d = SMA(pre_d,k,3,1)
+		d = SMA(pre_d,k,18,1)
 		j = 3*k-2*d
 		#print((d_data[-1][0],rsv,k,d,j))
 		return (d_data[-1][0],rsv,k,d,j)

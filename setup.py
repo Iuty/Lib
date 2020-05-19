@@ -23,5 +23,6 @@ setup(
         "IutyLib.stock",
         "IutyLib.tensor",
         "IutyLib.monitor",
+        "IutyLib.framework"
         ]
 )
