@@ -1,4 +1,4 @@
-from database.exceptions import *
+from IutyLib.database.exceptions import *
 from abc import abstractmethod
 import datetime
 
