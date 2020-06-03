@@ -183,7 +183,7 @@ class SqlDataBase(DataBaseParam):
             def creat(self,**kwargs):
                 if self._db.isTableExists(self.__class__.__name__):
                     return
-                kwargs['table'] = self.__class__.__name__
+                kwargs['table'] = self.__class__.__name__.lower()
                 columns = self.getColumns()
                 for column in columns:
                     if not 'columns' in kwargs:
@@ -193,27 +193,27 @@ class SqlDataBase(DataBaseParam):
                 return data
             
             def query(self,**kwargs):
-                kwargs['table'] = self.__class__.__name__
+                kwargs['table'] = self.__class__.__name__.lower()
                 data = self._db.excuteQuery.__call__(**kwargs)
                 return data
             
             def add(self,**kwargs):
-                kwargs['table'] = self.__class__.__name__
+                kwargs['table'] = self.__class__.__name__.lower()
                 data = self._db.excuteAdd.__call__(**kwargs)
                 return data
             
             def delete(self,**kwargs):
-                kwargs['table'] = self.__class__.__name__
+                kwargs['table'] = self.__class__.__name__.lower()
                 data = self._db.excuteDelete.__call__(**kwargs)
                 return data
             
             def update(self,**kwargs):
-                kwargs['table'] = self.__class__.__name__
+                kwargs['table'] = self.__class__.__name__.lower()
                 data = self._db.excuteUpdate.__call__(**kwargs)
                 return data
             
             def drop(self,**kwargs):
-                kwargs['table'] = self.__class__.__name__
+                kwargs['table'] = self.__class__.__name__.lower()
                 data = self._db.excuteDrop.__call__(**kwargs)
                 return data
             
