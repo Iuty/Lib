@@ -374,7 +374,7 @@ class SqlDataBase(DataBaseParam):
             sqlstr += ("limit " + kwargs['limit'] + ' ')
         
         #log here
-        #print(sqlstr)
+        print(sqlstr)
         
         db0 = self.excuteSql(sqlstr)
         data = []
