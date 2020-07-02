@@ -363,6 +363,8 @@ class SqlDataBase(DataBaseParam):
         if not 'table' in kwargs:
             raise QueryError('Query Has No Table')
         sqlstr += ('from ' + "`" + kwargs['table'] + "`" + ' ')
+        if 'join' in kwargs:
+            sqlstr += (kwargs['join'] + ' ')
         if 'where' in kwargs:
             sqlstr += ("where " + kwargs['where'] + ' ')
         if 'groupby' in kwargs:
