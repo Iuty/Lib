@@ -2,7 +2,7 @@ from IutyLib.file.files import StringFile
 import os,datetime,threading
 
 class Log(StringFile):
-	def __init__(self,root = './/logs//',title = 'default'):
+	def __init__(self,root = './/logs//',title = 'log'):
 		if not os.path.exists(root):
 			p = '.'
 			ps = root.split('//')
