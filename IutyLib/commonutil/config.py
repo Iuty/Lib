@@ -33,6 +33,8 @@ class Config:
         return self._config.get(session,key)
     
     def set(self,session,key,val):
+        if not self._config.has_session(session):
+            self.add_session(session)
         self._config.set(session,key,val)
         
         with open(self._path,'w') as f:
