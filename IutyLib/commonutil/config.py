@@ -34,7 +34,7 @@ class Config:
     
     def set(self,session,key,val):
         if not self._config.has_section(session):
-            self.add_section(session)
+            self._config.add_section(session)
         self._config.set(session,key,val)
         
         with open(self._path,'w') as f:
