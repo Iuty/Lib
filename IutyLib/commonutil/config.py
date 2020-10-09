@@ -47,12 +47,13 @@ class Config:
         self._config.read(self._path)
         pass
     
-    def copy(self,target,section,key):
+    def copy(self,target,section,key,defaultvalue):
         v = self._config.get(section,key)
-        if v:
-            try:
-                target.set(section,key,v)
-            except Exception as err:
-                a = 1
+        if not v:
+            v = defaultvalue
+        try:
+            target.set(section,key,v)
+        except Exception as err:
+            a = 1
         pass
         
