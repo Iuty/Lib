@@ -54,6 +54,6 @@ class Config:
         try:
             target.set(section,key,v)
         except Exception as err:
-            a = 1
+            print(err+"in Config copy")
         pass
         
