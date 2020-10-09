@@ -33,7 +33,7 @@ class Config:
         rtn = None
         try:
             rtn = self._config.get(session,key)
-        except Exception err:
+        except Exception(err):
             a = 1
         return rtn
     
