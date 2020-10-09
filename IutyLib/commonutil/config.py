@@ -30,7 +30,12 @@ class Config:
         pass
         
     def get(self,session,key):
-        return self._config.get(session,key)
+        rtn = None
+        try:
+            rtn = self._config.get(session,key)
+        except Exception err:
+            a = 1
+        return rtn
     
     def set(self,session,key,val):
         if not self._config.has_section(session):
