@@ -23,6 +23,7 @@ setup(
         "IutyLib.stock",
         "IutyLib.tensor",
         "IutyLib.monitor",
+        "IutyLib.notice",
         "IutyLib.framework",
         "IutyLib.encription",
         "IutyLib.show",
