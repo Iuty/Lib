@@ -47,6 +47,12 @@ class Config:
         self._config.read(self._path)
         pass
     
+    def getSections(self):
+        return self._config.section()
+    
+    def getOptions(self,section):
+        return self._config.options(section)
+    
     def copy(self,target,section,key,defaultvalue):
         v = self._config.get(section,key)
         if not v:
