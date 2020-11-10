@@ -57,7 +57,7 @@ class Config:
         try:
             rtn = self._config.sections()
         except Exception as err:
-            print(err+"in Config getSections")
+            print(str(err)+"in Config getSections")
         return rtn
     
     def getOptions(self,section):
@@ -65,7 +65,7 @@ class Config:
         try:
             rtn = self._config.options(section)
         except Exception as err:
-            print(err+"in Config getOption")
+            print(str(err)+"in Config getOption")
         return rtn
     
     def rmSection(self,section):
