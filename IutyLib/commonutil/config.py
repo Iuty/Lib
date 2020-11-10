@@ -52,10 +52,21 @@ class Config:
         pass
     
     def getSections(self):
-        return self._config.section()
+        
+        rtn = []
+        try:
+            rtn = self._config.sections()
+        except Exception as err:
+            print(err+"in Config getSections")
+        return rtn
     
     def getOptions(self,section):
-        return self._config.options(section)
+        rtn = []
+        try:
+            rtn = self._config.options(section)
+        except Exception as err:
+            print(err+"in Config getOption")
+        return rtn
     
     def rmSection(self,section):
         self._config.remove_section(section)
