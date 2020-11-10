@@ -42,6 +42,10 @@ class Config:
             self._config.add_section(session)
         self._config.set(session,key,val)
         
+        self.save()
+        pass
+    
+    def save(self):
         with open(self._path,'w') as f:
             self._config.write(f)
         self._config.read(self._path)
@@ -54,10 +58,14 @@ class Config:
         return self._config.options(section)
     
     def rmSection(self,section):
-        return self._config.remove_section(section)
+        self._config.remove_section(section)
+        self.save()
+        pass
     
     def rmOption(self,section,option):
-        return self._config.remove_option(section,option)
+        self._config.remove_option(section,option)
+        self.save()
+        pass
     
     def copy(self,target,section,key,defaultvalue):
         v = self._config.get(section,key)
