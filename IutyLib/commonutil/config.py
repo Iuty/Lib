@@ -53,6 +53,12 @@ class Config:
     def getOptions(self,section):
         return self._config.options(section)
     
+    def rmSection(self,section):
+        return self._config.remove_section(section)
+    
+    def rmOption(self,section,option):
+        return self._config.remove_option(section,option)
+    
     def copy(self,target,section,key,defaultvalue):
         v = self._config.get(section,key)
         if not v:
