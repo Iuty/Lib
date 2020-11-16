@@ -120,8 +120,8 @@ class SqlDataBase(DataBaseParam):
     _db = None
     
     
-    def __init__(self,host,user,password,dbname,**kwargs):
-        DataBaseParam.__init__(self,host,user,password,dbname,port=3306)
+    def __init__(self,host,user,password,dbname,port=3306,**kwargs):
+        DataBaseParam.__init__(self,host,user,password,dbname,port)
         self.Model = self.getModel.__call__()
         self._dbname = dbname
         
