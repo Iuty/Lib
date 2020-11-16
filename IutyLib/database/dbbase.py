@@ -11,6 +11,7 @@ class DataBaseParam:
     def __init__(self,host,user,password,dbname,port=3306):
         self.host = host
         self.user = user
+        self.port = port
         self.password = password
         self.dbname = dbname
     
