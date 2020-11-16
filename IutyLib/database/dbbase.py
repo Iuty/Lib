@@ -8,7 +8,7 @@ class DataBaseParam:
     password = None
     dbname = None
     
-    def __init__(self,host,user,password,dbname):
+    def __init__(self,host,user,password,dbname,port=3306):
         self.host = host
         self.user = user
         self.password = password
@@ -121,7 +121,7 @@ class SqlDataBase(DataBaseParam):
     
     
     def __init__(self,host,user,password,dbname,**kwargs):
-        DataBaseParam.__init__(self,host,user,password,dbname)
+        DataBaseParam.__init__(self,host,user,password,dbname,port=3306)
         self.Model = self.getModel.__call__()
         self._dbname = dbname
         

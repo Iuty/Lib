@@ -3,12 +3,12 @@ import pymysql as mysql
 import datetime
 
 class MySql(SqlDataBase):
-    def __init__(self,host,user,password,dbname,**kwargs):
-        SqlDataBase.__init__(self,host,user,password,dbname,**kwargs)
+    def __init__(self,host,user,password,dbname,port=3306,**kwargs):
+        SqlDataBase.__init__(self,host,user,password,dbname,port,**kwargs)
         self._db = mysql
     
     def connect(self):
-        dbx = self._db.connect(host=self.host, user=self.user,
+        dbx = self._db.connect(host=self.host, user=self.user,port=self.port,
                                 password=self.password, database=self.dbname,
                                 charset='utf8')
         dbx.autocommit(True)
@@ -19,7 +19,7 @@ class MySql(SqlDataBase):
 
 
 if __name__ == '__main__':
-	mysql = MySql('localhost','root','fastcorp','test')
+	mysql = MySql(host='localhost',port=3306,user='root',password='fastcorp',database='test')
 	
 	class test(mysql.Model):
 		ID = Column(PrimaryKey = True,AutoIncrement = True)
