@@ -18,7 +18,7 @@ setup(
     packages=[
         #"IutyLib",
         "IutyLib.commonutil",
-        "IutyLIb.coding",
+        "IutyLib.coding",
         "IutyLib.database",
         "IutyLib.file",
         "IutyLib.stock",
